@@ -1,612 +1,275 @@
-package com.teamsart.spring.controller.win;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.rowset.JoinRowSet;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.eval.forked.ForkedEvaluator;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
+import org.apache.poi.xssf.usermodel.*;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.teamsart.spring.controller.SpringController;
-
-@Controller
-@RequestMapping(value = "/win")
-public class WinController extends SpringController {
-
-	public final static String INDEXTARGET = ".win.index";
-	public final static String INFILE = "c://win/wout.xlsx";
-	
-@RequestMapping (value = "/index")
-public String index (HttpServletRequest req,ModelMap model) throws FileNotFoundException, InvalidFormatException {
-    LocalTime starttime = LocalTime.now();
-    LocalTime singletime;
-    //totol cnt
-    int cnt=0;
-    //
-    int singlecnt=0;
-    try {
-        FileInputStream inf = new FileInputStream("C:\\win\\W2.xlsm");
-        //取得活頁薄
-        XSSFWorkbook wb = new XSSFWorkbook(inf);
-        //取得工作表
-        XSSFSheet sheet = wb.getSheetAt(0);
-        //自動更新物件
-
-        FormulaEvaluator formatwb =  new XSSFFormulaEvaluator((XSSFWorkbook) wb);
-        // 取最後一行的行數
-        int rowlen = sheet.getLastRowNum();
-        ///起始行
-        int rowstart = 1;
-        //number的個數
-        int q=39;
-
-
-        //設定1N
-
-        XSSFRow rown1;
-        XSSFRow rown2;
-        XSSFCell celln1; //n1
-        XSSFCell celln2; //n2
-        CellValue cellvaluen1;
-        Date s1 = new Date();
-        
-        //寫入檔設定
-        XSSFWorkbook wbadd = wbWrite();
-        XSSFSheet sheetadd = wbadd.getSheet(String.valueOf(rowlen));
-        //XSSFRow rowadd = sheetadd.createRow((short)sheetadd.getLastRowNum());
-        cnt = (short)sheetadd.getLastRowNum();
-        System.out.println("cnt start:"+cnt);
-        
-        
-/*         //title
-        String[] title = {"","n1","n2","n3","n4","nsolongshow","1star","2star","3star","nsumshow"};
-        XSSFRow toprow = sheetadd.createRow(0);
-        XSSFCell topcell=null;
-        for(int i=1;i<=title.length-1;i++) {
-            topcell = toprow.createCell(i);
-            topcell.setCellValue(title[i]);
-        }
-        */
-        for(int i=5;i<=5;i++) {
-        	 	
-            
-            rown1= sheet.getRow(1);
-            celln1 = rown1.getCell(16);
-            celln1.setCellValue(i<10 ? "0"+i:String.valueOf(i));
-            //寫入行值
-
-
-            //刷新公式更新值
-            for(int icnt =rowstart ; icnt<= rowlen ; icnt++) {
-                rown1=sheet.getRow(icnt);
-                celln1=rown1.getCell(16);
-                // formatwb.evaluateFormulaCell(celln1);
-                formatwb.notifyUpdateCell(celln1);
-                //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-            }
-
-            for(int j=i+1;j<=q;j++) {
-
-                sheet.getRow(1).getCell(17).setCellValue( j<10 ? "0"+j : String.valueOf(j));
-
-                for(int jcnt=rowstart ; jcnt<=rowlen ; jcnt++ ){
-                    rown1=sheet.getRow(jcnt);
-                    celln1=rown1.getCell(17);
-                    // formatwb.evaluateFormulaCell(celln1);
-                    formatwb.notifyUpdateCell(celln1);
-                    //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-                }
-                for(int k=j+1;k<=q;k++) {
-
-                    sheet.getRow(1).getCell(18).setCellValue( k<10 ? "0"+k : String.valueOf(k));
-
-                    for(int kcnt=rowstart; kcnt <= rowlen; kcnt++){
-                        rown1=sheet.getRow(kcnt);
-                        celln1=rown1.getCell(18);
-                        // formatwb.evaluateFormulaCell(celln1);
-                        formatwb.notifyUpdateCell(celln1);
-                        //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-                    }
-                    for(int v=k+1;v<=q;v++) {
-
-                        sheet.getRow(1).getCell(19).setCellValue( v<10 ? "0"+v : String.valueOf(v));
-
-                        for(int kcnt=rowstart; kcnt <= rowlen; kcnt++){
-                            rown1=sheet.getRow(kcnt);
-                            celln1=rown1.getCell(19);
-                            // formatwb.evaluateFormulaCell(celln1);
-                            formatwb.notifyUpdateCell(celln1);
-                            //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-                        }
-                        //寫入值.讀取最後的ROW值
-                        XSSFRow nrow = sheetadd.createRow((int) sheetadd.getLastRowNum() + 1);
-
-                        XSSFCell ncell = nrow.createCell(1);
-                        //cnt
-                        nrow.createCell(0).setCellValue(cnt);
-                        //n1
-                        ncell.setCellValue(sheet.getRow(1).getCell(16).getStringCellValue());
-                        //n2
-                        ncell = nrow.createCell(2);
-                        ncell.setCellValue(sheet.getRow(1).getCell(17).getStringCellValue());
-                        //n3
-                        ncell = nrow.createCell(3);
-                        ncell.setCellValue(sheet.getRow(1).getCell(18).getStringCellValue());
-                        //n4
-                        ncell = nrow.createCell(4);
-                        ncell.setCellValue(sheet.getRow(1).getCell(19).getStringCellValue());
-                        //nlongshowcnt
-                        ncell = nrow.createCell(5);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(2).getCell(25)).getNumberValue());
-                        //s1
-                        ncell = nrow.createCell(6);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(35).getCell(25)).getNumberValue());
-                        //s2
-                        ncell = nrow.createCell(7);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(36).getCell(25)).getNumberValue());
-                        //s3
-                        ncell = nrow.createCell(8);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(37).getCell(25)).getNumberValue());
-                        cnt++;
-                        singlecnt++;
-                        if((singlecnt % 1000 ==0)) {
-                            savaExcel(wbadd);
-                            wbadd = wbWrite();
-                            sheetadd = wbadd.getSheet(String.valueOf(rowlen));
-                            singletime = LocalTime.now();
-                            System.out.println( " singlecnt :" +singlecnt + " starttime: " + starttime + " to single time : "+ singletime);
-                            
-                            }
-                    }
-                    System.out.println( " i : " + i +" j :" + j +" k :"+k+" cnt:"+cnt + " singlecnt :" +singlecnt );
-                }
-                
-                System.out.println("cnt:"+cnt + " singlecnt :" +singlecnt);
-
-            }
-            if((i==5)) {
-            savaExcel(wbadd);
-            }
-        }
-
-        inf.close();
-        System.out.println("YES WIN!");
-        System.out.println("starttime: " + starttime + " to : "+ new Date());
-    } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    }finally {
-
-
-    }
-
-	model.addAttribute("cnt",singlecnt);
-	return INDEXTARGET;
-}
-
-protected static void savaExcel(XSSFWorkbook wb){
-    FileOutputStream fileOut = null;
-    try {
-        fileOut = new FileOutputStream(INFILE);
-        wb.write(fileOut);
-        fileOut.flush();
-        fileOut.close();
-    } catch (FileNotFoundException e) {
-        e.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
-    } finally {
-    	if(fileOut!=null) {
-    		try {
-				fileOut.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    }
-}
-
-protected static XSSFWorkbook wbWrite(){
-XSSFWorkbook wb = null;
-FileInputStream fis = null;
-File f = new File(INFILE);
-
-    try {
-        if (f!=null) {
-            fis = new FileInputStream(f);
-            wb = new XSSFWorkbook(fis);
-        }
-    } catch (Exception e) {
-        return null;
-    }finally{
-        if(fis!=null){
-            try {
-                fis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    return wb;
-
-}
-public static XSSFWorkbook getWorkBook(String filePath) {
-	XSSFWorkbook workbook =  null;
-	try {
-		File fileXlsxPath = new File(filePath);
-		fileXlsxPath.createNewFile();
-		FileOutputStream outs = new FileOutputStream(fileXlsxPath);
-		//BufferedOutputStream outPutStream = new BufferedOutputStream(FileUtils.openOutputStream(fileXlsxPath));
-		workbook = new XSSFWorkbook();
-		workbook.createSheet("測試");
-		workbook.write(outs);
-		
-		outs.close();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	return workbook;
-}
-
-
-
-private static void updatecnt(XSSFWorkbook wb,XSSFSheet sheet,int i,int rowstart) {
-//	XSSFRow r=s.getRow(row);
-//	XSSFCell c =null;
-FormulaEvaluator formatwb = null;
-	formatwb = new XSSFFormulaEvaluator((XSSFWorkbook)wb);
-//	for(int i = r.getFirstCellNum();i<r.getLastCellNum();i++)
-//		c=r.getCell(i);
-//	if(c.getCellType()==Cell.CELL_TYPE_FORMULA)
-//		eval.evaluateFormulaCell(c);
-
-	XSSFRow rown1;
-	XSSFCell celln1;
-	CellValue cellvaluen1;
-	 for(int j =rowstart;j<=10;j++) {
-		 rown1=sheet.getRow(j);
-		 celln1=rown1.getCell(16);
-		// formatwb.evaluateFormulaCell(celln1);
-		 formatwb.notifyUpdateCell(celln1);
-		  	System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-	}
-	 
-}
-
-}
-package com.teamsart.spring.controller.win;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.io.*;
+import java.time.Duration;
 import java.time.LocalTime;
-import java.util.Date;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.rowset.JoinRowSet;
+public class winver4 {
 
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.eval.forked.ForkedEvaluator;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellValue;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
+    public final static String INDEXTARGET = ".win.index";
+    public final static String INFILE = "c://win/Wout.xlsx";
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
+    public static void main(String[] args) {
 
-import com.teamsart.spring.controller.SpringController;
+        LocalTime starttime = LocalTime.now();
+        //totol cnt
+        int cnt=0;
+        //單次寫入次數
+        int singlecnt=1000;
 
-@Controller
-@RequestMapping(value = "/win")
-public class WinController extends SpringController {
+        try {
+            //獲取資料流
+            FileInputStream inf = new FileInputStream("C://win//W2.xlsx");
 
-	public final static String INDEXTARGET = ".win.index";
-	public final static String INFILE = "c://win/wout.xlsx";
-	
-@RequestMapping (value = "/index")
-public String index (HttpServletRequest req,ModelMap model) throws FileNotFoundException, InvalidFormatException {
-    LocalTime starttime = LocalTime.now();
-    LocalTime singletime;
-    //totol cnt
-    int cnt=0;
-    //
-    int singlecnt=0;
-    try {
-        FileInputStream inf = new FileInputStream("C:\\win\\W2.xlsm");
-        //取得活頁薄
-        XSSFWorkbook wb = new XSSFWorkbook(inf);
-        //取得工作表
-        XSSFSheet sheet = wb.getSheetAt(0);
-        //自動更新物件
+            //取得活頁薄
+            XSSFWorkbook wb = new XSSFWorkbook(inf);
 
-        FormulaEvaluator formatwb =  new XSSFFormulaEvaluator((XSSFWorkbook) wb);
-        // 取最後一行的行數
-        int rowlen = sheet.getLastRowNum();
-        ///起始行
-        int rowstart = 1;
-        //number的個數
-        int q=39;
+            //取得工作表
+            XSSFSheet sheet = wb.getSheetAt(0);
 
+            //自動更新物件
+            FormulaEvaluator formatwb =  new XSSFFormulaEvaluator((XSSFWorkbook) wb);
 
-        //設定1N
+            // 取最後一行的行數
+            int rowlen = sheet.getLastRowNum();
+            //String sheetname= String.valueOf(sheet.getLastRowNum());
 
-        XSSFRow rown1;
-        XSSFRow rown2;
-        XSSFCell celln1; //n1
-        XSSFCell celln2; //n2
-        CellValue cellvaluen1;
-        Date s1 = new Date();
-        
-        //寫入檔設定
-        XSSFWorkbook wbadd = wbWrite();
-        XSSFSheet sheetadd = wbadd.getSheet(String.valueOf(rowlen));
-        //XSSFRow rowadd = sheetadd.createRow((short)sheetadd.getLastRowNum());
-        cnt = (short)sheetadd.getLastRowNum();
-        System.out.println("cnt start:"+cnt);
-        
-        
-/*         //title
-        String[] title = {"","n1","n2","n3","n4","nsolongshow","1star","2star","3star","nsumshow"};
-        XSSFRow toprow = sheetadd.createRow(0);
-        XSSFCell topcell=null;
-        for(int i=1;i<=title.length-1;i++) {
-            topcell = toprow.createCell(i);
-            topcell.setCellValue(title[i]);
-        }
-        */
-        for(int i=5;i<=5;i++) {
-        	 	
-            
-            rown1= sheet.getRow(1);
-            celln1 = rown1.getCell(16);
-            celln1.setCellValue(i<10 ? "0"+i:String.valueOf(i));
-            //寫入行值
+            ///起始行
+            int rowstart = 1;
+
+            //number的個數
+            int q=39;
+
+            //start number
+            int istart = 1;
+
+            //設定控制number個數
+            int qcnt=5;
+
+            //寫入檔設定
+            XSSFWorkbook wbadd = wbWrite();
+            XSSFSheet sheetadd = null;
+
+            if(wbadd.getSheet(String.valueOf(qcnt+"star-"+rowlen)) != null){
+                sheetadd = wbadd.getSheet(String.valueOf(qcnt+"star-"+rowlen));
+            } else {
+                sheetadd = wbadd.createSheet(String.valueOf(qcnt+"star-"+rowlen));
+                //title
+                String[] title = {"cnt","n1","n2","n3","n4","n5","nsolongshow","1star","2star","3star","nsumshow","nownoshowcnt"};
+                XSSFRow toprow = sheetadd.createRow(0);
+                XSSFCell topcell=null;
+                for(int i=0;i<=title.length-1;i++) {
+                    topcell = toprow.createCell(i);
+                    topcell.setCellValue(title[i]);
+                }
+            }
+            //XSSFRow rowadd = sheetadd.createRow((short)sheetadd.getLastRowNum());
+            cnt = sheetadd.getLastRowNum()+1;
+            System.out.println("cnt start:"+cnt);
 
 
-            //刷新公式更新值
-            for(int icnt =rowstart ; icnt<= rowlen ; icnt++) {
-                rown1=sheet.getRow(icnt);
-                celln1=rown1.getCell(16);
+
+
+            for(int i=istart;i<=q;i++) {
+
+                sheet.getRow(1).getCell(16).setCellValue(i<10 ? "0"+i:String.valueOf(i));
+                //寫入行值
+
+
+                //刷新公式更新值
+                //  for(int icnt =rowstart ; icnt<= rowlen ; icnt++) {
+                //rown1=sheet.getRow(icnt);
+                //celln1=rown1.getCell(16);
                 // formatwb.evaluateFormulaCell(celln1);
-                formatwb.notifyUpdateCell(celln1);
+                //        formatwb.notifyUpdateCell(sheet.getRow(icnt).getCell(16));
                 //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-            }
+                //     }
 
-            for(int j=i+1;j<=q;j++) {
+                for(int j=i+1;j<=q;j++) {
 
-                sheet.getRow(1).getCell(17).setCellValue( j<10 ? "0"+j : String.valueOf(j));
+                    sheet.getRow(1).getCell(17).setCellValue( j<10 ? "0"+j : String.valueOf(j));
 
-                for(int jcnt=rowstart ; jcnt<=rowlen ; jcnt++ ){
-                    rown1=sheet.getRow(jcnt);
-                    celln1=rown1.getCell(17);
-                    // formatwb.evaluateFormulaCell(celln1);
-                    formatwb.notifyUpdateCell(celln1);
-                    //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-                }
-                for(int k=j+1;k<=q;k++) {
-
-                    sheet.getRow(1).getCell(18).setCellValue( k<10 ? "0"+k : String.valueOf(k));
-
-                    for(int kcnt=rowstart; kcnt <= rowlen; kcnt++){
-                        rown1=sheet.getRow(kcnt);
-                        celln1=rown1.getCell(18);
-                        // formatwb.evaluateFormulaCell(celln1);
-                        formatwb.notifyUpdateCell(celln1);
-                        //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                    for(int jcnt=rowstart ; jcnt<=rowlen ; jcnt++ ){
+                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(16));
+                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(17));
+                        //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
                     }
-                    for(int v=k+1;v<=q;v++) {
+                    for(int k=j+1;k<=q;k++) {
 
-                        sheet.getRow(1).getCell(19).setCellValue( v<10 ? "0"+v : String.valueOf(v));
+                        if(qcnt > 2) {
 
-                        for(int kcnt=rowstart; kcnt <= rowlen; kcnt++){
-                            rown1=sheet.getRow(kcnt);
-                            celln1=rown1.getCell(19);
-                            // formatwb.evaluateFormulaCell(celln1);
-                            formatwb.notifyUpdateCell(celln1);
-                            //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-                        }
-                        //寫入值.讀取最後的ROW值
-                        XSSFRow nrow = sheetadd.createRow((int) sheetadd.getLastRowNum() + 1);
+                            sheet.getRow(1).getCell(18).setCellValue(k < 10 ? "0" + k : String.valueOf(k));
 
-                        XSSFCell ncell = nrow.createCell(1);
-                        //cnt
-                        nrow.createCell(0).setCellValue(cnt);
-                        //n1
-                        ncell.setCellValue(sheet.getRow(1).getCell(16).getStringCellValue());
-                        //n2
-                        ncell = nrow.createCell(2);
-                        ncell.setCellValue(sheet.getRow(1).getCell(17).getStringCellValue());
-                        //n3
-                        ncell = nrow.createCell(3);
-                        ncell.setCellValue(sheet.getRow(1).getCell(18).getStringCellValue());
-                        //n4
-                        ncell = nrow.createCell(4);
-                        ncell.setCellValue(sheet.getRow(1).getCell(19).getStringCellValue());
-                        //nlongshowcnt
-                        ncell = nrow.createCell(5);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(2).getCell(25)).getNumberValue());
-                        //s1
-                        ncell = nrow.createCell(6);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(35).getCell(25)).getNumberValue());
-                        //s2
-                        ncell = nrow.createCell(7);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(36).getCell(25)).getNumberValue());
-                        //s3
-                        ncell = nrow.createCell(8);
-                        ncell.setCellValue(formatwb.evaluate(sheet.getRow(37).getCell(25)).getNumberValue());
-                        cnt++;
-                        singlecnt++;
-                        if((singlecnt % 1000 ==0)) {
-                            savaExcel(wbadd);
-                            wbadd = wbWrite();
-                            sheetadd = wbadd.getSheet(String.valueOf(rowlen));
-                            singletime = LocalTime.now();
-                            System.out.println( " singlecnt :" +singlecnt + " starttime: " + starttime + " to single time : "+ singletime);
-                            
+                            for (int kcnt = rowstart; kcnt <= rowlen; kcnt++) {
+                                formatwb.notifyUpdateCell(sheet.getRow(kcnt).getCell(18));
+                                //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
                             }
+                        }
+
+                        for(int v=k+1;v<=q;v++) {
+
+                            if(qcnt > 3 ) {
+
+                                sheet.getRow(1).getCell(19).setCellValue(v < 10 ? "0" + v : String.valueOf(v));
+
+                                for (int kcnt = rowstart; kcnt <= rowlen; kcnt++) {
+                                    formatwb.notifyUpdateCell(sheet.getRow(kcnt).getCell(19));
+                                    //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                                }
+                            }
+                            for (int m = v+1; m <q ; m++) {
+                                if(qcnt > 4 ) {
+
+                                    sheet.getRow(1).getCell(20).setCellValue(m < 10 ? "0" + m : String.valueOf(m));
+
+                                    for (int kcnt = rowstart; kcnt <= rowlen; kcnt++) {
+                                        formatwb.notifyUpdateCell(sheet.getRow(kcnt).getCell(20));
+                                        //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                                    }
+                                }else{
+                                    m=99;
+                                    if (qcnt<4) {
+                                        v = 99;
+                                        if (qcnt < 3)
+                                            k = 99;
+                                    }
+                                }
+
+                                //寫入值.讀取最後的ROW值
+                                writeData(sheetadd, sheet, formatwb, cnt, qcnt);
+
+                                cnt++;
+                                System.out.println("k: " + k + "  v: " + v + "  m: " + m  + " cnt :" + cnt + " to single time : " + LocalTime.now());
+                                if ((cnt % singlecnt == 0)) {
+                                    savaExcel(wbadd);
+                                    wbadd = wbWrite();
+                                    sheetadd = wbadd.getSheet(String.valueOf(qcnt + "star-" + rowlen));
+
+                                    System.out.println(" save" + singlecnt + " recoed... in: " + (cnt / singlecnt) + " times ,Total singlecnt :" + singlecnt + " starttime: " + starttime + " to single time : " + Duration.between(starttime, LocalTime.now()).toMinutes() + " Minutes");
+                                    //清空所有更新值
+                                    formatwb.clearAllCachedResultValues();
+                                    //重新更新公式值
+                                    for (int jcnt = rowstart; jcnt <= rowlen; jcnt++) {
+                                        // formatwb.evaluateFormulaCell(celln1); '用在單次'
+                                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(16));
+                                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(17));
+                                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(18));
+                                        formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(19));
+                                        //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                                    }
+
+                                }
+                            }
+                        }
+                        System.out.println( " i : " + i +" j :" + j +" k :"+k+" cnt:"+cnt );
                     }
-                    System.out.println( " i : " + i +" j :" + j +" k :"+k+" cnt:"+cnt + " singlecnt :" +singlecnt );
+
+                    System.out.println("change j cnt:"+cnt);
+
                 }
-                
-                System.out.println("cnt:"+cnt + " singlecnt :" +singlecnt);
+                if((i==q)) {
+                    savaExcel(wbadd);
+                }
 
             }
-            if((i==5)) {
-            savaExcel(wbadd);
-            }
+
+            inf.close();
+            System.out.println("YES WIN!");
+            System.out.println("starttime: " + starttime + " to : "+ Duration.between(starttime,LocalTime.now()).toMinutes()+ " Minutes");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+
+
         }
 
-        inf.close();
-        System.out.println("YES WIN!");
-        System.out.println("starttime: " + starttime + " to : "+ new Date());
-    } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    }finally {
+    }
+    protected static void writeData(XSSFSheet sheetadd , XSSFSheet sheet,FormulaEvaluator formatwb,int cnt,int qcnt){
 
+        XSSFRow nrow = sheetadd.createRow((int) sheetadd.getLastRowNum() + 1);
+
+        //XSSFCell ncell = nrow.createCell(1);
+        //cnt
+        nrow.createCell(0).setCellValue(cnt);
+
+        for (int i = 1; i <= qcnt; i++) {
+
+            //n1~n-qcnt,Excel Q行
+            nrow.createCell(i).setCellValue(sheet.getRow(1).getCell(15+i).getStringCellValue());
+        }
+        //nlongshowcnt
+        //set cell
+        int startCell = 6;
+        //ncell = nrow.createCell(5);
+        nrow.createCell(startCell).setCellValue(formatwb.evaluate(sheet.getRow(2).getCell(25)).getNumberValue());
+        //s1
+        //ncell = nrow.createCell(6);
+        nrow.createCell(startCell+1).setCellValue(formatwb.evaluate(sheet.getRow(35).getCell(25)).getNumberValue());
+        //s2
+        //ncell = nrow.createCell(7);
+        nrow.createCell(startCell+2).setCellValue(formatwb.evaluate(sheet.getRow(36).getCell(25)).getNumberValue());
+        //s3
+        //ncell = nrow.createCell(8);
+        nrow.createCell(startCell+3).setCellValue(formatwb.evaluate(sheet.getRow(37).getCell(25)).getNumberValue());
+        //nsumshow
+        nrow.createCell(startCell+4).setCellValue(formatwb.evaluate(sheet.getRow(1).getCell(25)).getNumberValue());
+        //nownoshowcnt
+        nrow.createCell(startCell+5).setCellValue(formatwb.evaluate(sheet.getRow(2).getCell(26)).formatAsString());
 
     }
 
-	model.addAttribute("cnt",singlecnt);
-	return INDEXTARGET;
-}
-
-protected static void savaExcel(XSSFWorkbook wb){
-    FileOutputStream fileOut = null;
-    try {
-        fileOut = new FileOutputStream(INFILE);
-        wb.write(fileOut);
-        fileOut.flush();
-        fileOut.close();
-    } catch (FileNotFoundException e) {
-        e.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
-    } finally {
-    	if(fileOut!=null) {
-    		try {
-				fileOut.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    }
-}
-
-protected static XSSFWorkbook wbWrite(){
-XSSFWorkbook wb = null;
-FileInputStream fis = null;
-File f = new File(INFILE);
-
-    try {
-        if (f!=null) {
-            fis = new FileInputStream(f);
-            wb = new XSSFWorkbook(fis);
-        }
-    } catch (Exception e) {
-        return null;
-    }finally{
-        if(fis!=null){
-            try {
-                fis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+    protected static void savaExcel(XSSFWorkbook wb){
+        FileOutputStream fileOut = null;
+        try {
+            fileOut = new FileOutputStream(INFILE);
+            wb.write(fileOut);
+            fileOut.flush();
+            fileOut.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(fileOut!=null) {
+                try {
+                    fileOut.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
     }
-    return wb;
 
-}
-public static XSSFWorkbook getWorkBook(String filePath) {
-	XSSFWorkbook workbook =  null;
-	try {
-		File fileXlsxPath = new File(filePath);
-		fileXlsxPath.createNewFile();
-		FileOutputStream outs = new FileOutputStream(fileXlsxPath);
-		//BufferedOutputStream outPutStream = new BufferedOutputStream(FileUtils.openOutputStream(fileXlsxPath));
-		workbook = new XSSFWorkbook();
-		workbook.createSheet("測試");
-		workbook.write(outs);
-		
-		outs.close();
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	return workbook;
-}
+    protected static XSSFWorkbook wbWrite(){
+        XSSFWorkbook wb = null;
+        FileInputStream fis = null;
+        File f = new File(INFILE);
+        System.out.println(f.exists());
+        try {
+            if(!f.exists())
+                f.createNewFile();
+            if (f!=null) {
+                fis = new FileInputStream(f);
+                wb = new XSSFWorkbook(fis);
+            }
+        } catch (Exception e) {
+            return null;
+        }finally{
+            if(fis!=null){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("wb:"+wb);
+        return wb;
 
-
-
-private static void updatecnt(XSSFWorkbook wb,XSSFSheet sheet,int i,int rowstart) {
-//	XSSFRow r=s.getRow(row);
-//	XSSFCell c =null;
-FormulaEvaluator formatwb = null;
-	formatwb = new XSSFFormulaEvaluator((XSSFWorkbook)wb);
-//	for(int i = r.getFirstCellNum();i<r.getLastCellNum();i++)
-//		c=r.getCell(i);
-//	if(c.getCellType()==Cell.CELL_TYPE_FORMULA)
-//		eval.evaluateFormulaCell(c);
-
-	XSSFRow rown1;
-	XSSFCell celln1;
-	CellValue cellvaluen1;
-	 for(int j =rowstart;j<=10;j++) {
-		 rown1=sheet.getRow(j);
-		 celln1=rown1.getCell(16);
-		// formatwb.evaluateFormulaCell(celln1);
-		 formatwb.notifyUpdateCell(celln1);
-		  	System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
-	}
-	 
+    }
 }
 
-}
+
