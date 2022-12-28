@@ -9,7 +9,7 @@
 - 3.讀入原始檔的原儲存格儲存限制.
 
 **2022.12.28**
-同樣的code卻一直跑出
+- 同樣的code卻一直跑出
 
 ```java=+
 Java.lang.StackOverflowError 
