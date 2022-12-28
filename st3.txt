@@ -1,0 +1,128 @@
+public String start2 (HttpServletRequest req,ModelMap model) {
+    LocalDateTime starttime = LocalDateTime.now();
+    //totol cnt
+    int cnt=0;
+    //單次寫入次數
+    int singlecnt=500;
+
+    try {
+        //獲取資料流
+        FileInputStream inf = new FileInputStream("C://win//W2.xlsx");
+
+        //取得活頁薄
+        XSSFWorkbook wb = new XSSFWorkbook(inf);
+
+        //取得工作表
+        XSSFSheet sheet = wb.getSheetAt(0);
+
+        //自動更新物件
+        FormulaEvaluator formatwb =  new XSSFFormulaEvaluator((XSSFWorkbook) wb);
+
+        // 取最後一行的行數
+        int rowlen = sheet.getLastRowNum();
+        //String sheetname= String.valueOf(sheet.getLastRowNum());
+
+        ///起始行
+        int rowstart = 1;
+
+        //number的個數
+        int q=39;
+
+        //start number
+        int istart = 1;
+
+        //設定控制number個數
+        int qcnt=3;
+
+        //寫入檔設定
+        XSSFWorkbook wbadd = wbWrite();
+        XSSFSheet sheetadd = null;
+
+        if(wbadd.getSheet(String.valueOf(qcnt+"star-"+rowlen)) != null){
+            sheetadd = wbadd.getSheet(String.valueOf(qcnt+"star-"+rowlen));
+        } else {
+            sheetadd = wbadd.createSheet(String.valueOf(qcnt+"star-"+rowlen));
+            //title
+            String[] title = {"cnt","n1","n2","n3","n4","n5","nsolongshow","1star","2star","3star","nsumshow","nownoshowcnt"};
+            XSSFRow toprow = sheetadd.createRow(0);
+            XSSFCell topcell=null;
+            for(int i=0;i<=title.length-1;i++) {
+                topcell = toprow.createCell(i);
+                topcell.setCellValue(title[i]);
+            }
+        }
+        //XSSFRow rowadd = sheetadd.createRow((short)sheetadd.getLastRowNum());
+        cnt = sheetadd.getLastRowNum()+1;
+        System.out.println("cnt start:"+cnt);
+
+
+
+
+        for(int i=istart;i<=q;i++) {
+
+            sheet.getRow(1).getCell(16).setCellValue(i<10 ? "0"+i:String.valueOf(i));
+            //寫入行值
+
+
+            //刷新公式更新值
+            //  for(int icnt =rowstart ; icnt<= rowlen ; icnt++) {
+            //rown1=sheet.getRow(icnt);
+            //celln1=rown1.getCell(16);
+            // formatwb.evaluateFormulaCell(celln1);
+            //        formatwb.notifyUpdateCell(sheet.getRow(icnt).getCell(16));
+            //   System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+            //     }
+
+            for(int j=i+1;j<=q;j++) {
+
+                sheet.getRow(1).getCell(17).setCellValue( j<10 ? "0"+j : String.valueOf(j));
+
+                for(int jcnt=rowstart ; jcnt<=rowlen ; jcnt++ ){
+                    formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(16));
+                    formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(17));
+                    //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                }
+
+                            //寫入值.讀取最後的ROW值
+                            writeData(sheetadd, sheet, formatwb, cnt, qcnt);
+
+                            cnt++;
+                            //System.out.println("k: " + k + "  cnt :" + cnt + " to single time : " + LocalDateTime.now());
+                            if ((cnt % singlecnt == 0)) {
+                                savaExcel(wbadd);
+                                wbadd = wbWrite();
+                                sheetadd = wbadd.getSheet(String.valueOf(qcnt + "star-" + rowlen));
+                                System.out.println(" save" + singlecnt + " recoed... in: " + (cnt / singlecnt) + " times ,Total singlecnt :" + singlecnt + " starttime: " + starttime + " to single time : " + Duration.between(starttime, LocalDateTime.now()).toMinutes() + " Minutes");
+                                //清空所有更新值
+                                formatwb.clearAllCachedResultValues();
+                                //重新更新公式值
+                                for (int jcnt = rowstart; jcnt <= rowlen; jcnt++) {
+                                    // formatwb.evaluateFormulaCell(celln1); '用在單次'
+                                    formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(16));
+                                    formatwb.notifyUpdateCell(sheet.getRow(jcnt).getCell(17));
+                                    //  System.out.println(celln1+"      "+formatwb.evaluate(celln1).formatAsString());
+                                }
+
+                            }
+                     System.out.println( " i : " + i +" j :" + j +" cnt:"+cnt );
+
+                System.out.println("change j cnt:"+cnt);
+
+            }
+            if((i==q)) {
+                savaExcel(wbadd);
+            }
+
+        }
+
+        inf.close();
+        System.out.println("YES WIN!");
+        System.out.println("starttime: " + starttime + " to : "+ Duration.between(starttime,LocalDateTime.now()).toMinutes()+ " Minutes");
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    
+	model.addAttribute("cnt",cnt);
+	return INDEXTARGET;
+}
